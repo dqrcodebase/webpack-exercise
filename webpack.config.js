@@ -49,7 +49,7 @@ const config = {
           * document.head.appendChild(style);
         */
         //  使用 postcss-loader，自动添加 CSS3 部分属性的浏览器前缀
-        use: ['style-loader', 'css-loader','postcss-loader'], // use: 对应的loader名称
+        use: ['style-loader', 'css-loader', 'postcss-loader'], // use: 对应的loader名称
       }
     ]
   },
