@@ -1,3 +1,8 @@
+html {
+  overflow: scroll;
+  height: 100%;
+}
+
 body {
   margin: 10px auto;
   background: cyan;
@@ -10,4 +15,6 @@ body {
   left: 50%;
   transform: translateX(-50%);
   transition: all 1s;
+  overflow: scroll;
+  height: 100%;
 }

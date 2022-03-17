@@ -11,6 +11,8 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+// 分离样式文件
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 // 下载cross-env 就可以配置环境变量
 console.log('process.env.NODE_ENV=', process.env.NODE_ENV) // 打印环境变量
@@ -39,18 +41,88 @@ const config = {
   module: {
     // loader的执行顺序是固定从后往前，即按css-loader ---》 style-loader的顺序执行
     rules: [ // 转换规则
+      // {
+      //   test: /\.css$/, // 匹配所有的css文件
+      //   /** 
+      //     * style-loader 核心逻辑相当于：
+      //     * const content = `${样式内容}`
+      //     * const style = document.createElement('style');
+      //     * style.innerHTML = content;
+      //     * document.head.appendChild(style);
+      //   */
+      //   //  使用 postcss-loader，自动添加 CSS3 部分属性的浏览器前缀
+      //   use: ['style-loader', 'css-loader', 'postcss-loader'], // use: 对应的loader名称
+      // },
       {
-        test: /\.css$/, // 匹配所有的css文件
-        /** 
-          * style-loader 核心逻辑相当于：
-          * const content = `${样式内容}`
-          * const style = document.createElement('style');
-          * style.innerHTML = content;
-          * document.head.appendChild(style);
-        */
-        //  使用 postcss-loader，自动添加 CSS3 部分属性的浏览器前缀
-        use: ['style-loader', 'css-loader', 'postcss-loader'], // use: 对应的loader名称
-      }
+        test: /\.(s[ac]|c)ss$/i, //匹配所有的 sass/scss/css 文件
+        use: [
+          // 'style-loader', 
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'postcss-loader',
+          'sass-loader'], // use: 对应的loader名称
+      },
+      // {
+      //   test: /.(jpe?g|png|gif)$/i, // 匹配图片文件
+      //   use: [
+      //     // {
+      //     //   loader: 'file-loader',
+      //     //   options: {
+      //     //     name: '[name][hash:8].[ext]'
+      //     //   }
+      //     // },
+      //     {
+      //       loader: 'url-loader',
+      //       options: {
+      //         name: '[name][hash:8].[ext]',
+      //         // 文件小于 50k 会转换为 base64，大于则拷贝文件
+      //         limit: 50 * 1024
+      //       }
+      //     }
+      //   ]
+      // },
+
+      /**
+      * 在webpakc5中
+      * asset/resource 发送一个单独的文件并导出 URL。之前通过使用 file-loader 实现。
+      * asset/inline 导出一个资源的 data URI。之前通过使用 url-loader 实现。
+      * asset/source 导出资源的源代码。之前通过使用 raw-loader 实现。
+      * asset 在导出一个 data URI 和发送一个单独的文件之间自动选择。之前通过使用 url-loader，并且配置资源体积限制实现。
+      * 
+      * 在webpakc5中,内置了资源处理模块，file-loader 和 url-loader 都可以不用安装
+      */
+      {
+        test: /.(jpe?g|png|gif)$/i, // 匹配图片文件
+        type: 'asset',
+        parser: {
+          dataUrlCondition: {
+            maxSize: 8 * 1024 // 8kb
+          }
+        },
+        generator: {
+          filename: 'static/[name][hash:8][ext][query]'
+        }
+      },
+      {
+        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/i,  // 匹配字体文件
+        type: 'asset/resource',
+        generator: {
+          filename: 'static/fonts/[name][hash:8].[ext]'
+        }
+      },
+      {
+        test: /\.js$/i,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                '@babel/preset-env'
+              ],
+            }
+          }
+        ]
+      },
     ]
   },
   plugins: [
@@ -60,6 +132,9 @@ const config = {
     }),
     // 清空上次打包文件
     new CleanWebpackPlugin(), // 引入插件
+    new MiniCssExtractPlugin({
+      filename: '[name].[hash:8].css'
+    })
   ]
 }
 
