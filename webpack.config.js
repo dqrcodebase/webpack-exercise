@@ -23,6 +23,7 @@ const config = {
     filename: 'bundle.js', // 输出文件名
     path: path.join(__dirname, 'dist') // 输出文件目录
   },
+  devtool: 'source-map',
   // 这边用的是3.11.2，当版本 version >= 4.0.0 时，需要使用 devServer.static 进行配置，
   // 不再有 devServer.contentBase 配置项。
   devServer: {
@@ -112,16 +113,7 @@ const config = {
       },
       {
         test: /\.js$/i,
-        use: [
-          {
-            loader: 'babel-loader',
-            options: {
-              presets: [
-                '@babel/preset-env'
-              ],
-            }
-          }
-        ]
+        use: ['babel-loader']
       },
     ]
   },
