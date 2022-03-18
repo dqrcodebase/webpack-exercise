@@ -13,6 +13,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 // 分离样式文件
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+// 构建费时分析
+// 有些 Loader 或者 Plugin 新版本会不兼容，需要进行降级处理
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
+const smp = new SpeedMeasurePlugin();
 
 // 下载cross-env 就可以配置环境变量
 console.log('process.env.NODE_ENV=', process.env.NODE_ENV) // 打印环境变量
@@ -21,8 +25,10 @@ const config = {
   entry: './src/index.js', // 打包入口地址
   output: {
     filename: 'bundle.js', // 输出文件名
-    path: path.join(__dirname, 'dist') // 输出文件目录
+    path: path.join(__dirname, 'dist'), // 输出文件目录
+    publicPath: './'
   },
+  // SourceMap 是一种映射关系，当项目运行后，如果出现错误，我们可以利用 SourceMap 反向定位到源码位置
   devtool: 'source-map',
   // 这边用的是3.11.2，当版本 version >= 4.0.0 时，需要使用 devServer.static 进行配置，
   // 不再有 devServer.contentBase 配置项。
@@ -108,7 +114,7 @@ const config = {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/i,  // 匹配字体文件
         type: 'asset/resource',
         generator: {
-          filename: 'static/fonts/[name][hash:8].[ext]'
+          filename: '[name][hash:8][ext]'
         }
       },
       {
@@ -132,6 +138,7 @@ const config = {
 
 module.exports = (env, argv) => {
   console.log('argv.mode=', argv.mode) // 打印mode(模式) 值
+  // return config
   // 这里可以通过不同的模式修改config配置
-  return config
+  return smp.wrap(config);
 }
