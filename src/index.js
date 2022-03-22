@@ -3,7 +3,9 @@ import './mains.scss'
 import bg from '../public/ysby.jpeg'
 // 引入字体图标文件
 import './media/iconfont.css'
-
+import $ from 'jquery';
+console.log("🚀 ~ file: index.js ~ line 7 ~ $", $)
+console.log(jQuery)
 const a = "hello item"
 console.log(a)
 const img = new Image()

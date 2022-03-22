@@ -15,8 +15,15 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 // 构建费时分析
 // 有些 Loader 或者 Plugin 新版本会不兼容，需要进行降级处理
+// 注意：在 webpack5.x 中为了使用费时分析去对插件进行降级或者修改配置写法是非常不划算的，
+// 这里因为演示需要，我后面会继续使用，但是在平时开发中，建议还是不要使用
 const SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
 const smp = new SpeedMeasurePlugin();
+
+// 路径处理方法
+function resolve (dir) {
+  return path.join(__dirname, dir);
+}
 
 // 下载cross-env 就可以配置环境变量
 console.log('process.env.NODE_ENV=', process.env.NODE_ENV) // 打印环境变量
@@ -25,8 +32,8 @@ const config = {
   entry: './src/index.js', // 打包入口地址
   output: {
     filename: 'bundle.js', // 输出文件名
-    path: path.join(__dirname, 'dist'), // 输出文件目录
-    publicPath: './'
+    path: resolve('dist'), // 输出文件目录
+    // publicPath: './src/index.html',
   },
   // SourceMap 是一种映射关系，当项目运行后，如果出现错误，我们可以利用 SourceMap 反向定位到源码位置
   devtool: 'source-map',
@@ -133,12 +140,35 @@ const config = {
     new MiniCssExtractPlugin({
       filename: '[name].[hash:8].css'
     })
-  ]
+  ],
+  resolve: {
+    alias: {
+      '@': resolve('src')
+    },
+    /**
+     * 如果用户引入模块时不带扩展名
+     * 那么 webpack 就会按照 extensions 配置的数组从左到右的顺序去尝试解析模块
+     * 需要注意的是：
+     * 1、高频文件后缀名放前面；
+     * 2、手动配置后，默认配置会被覆盖
+     * 如果想保留默认配置，可以用 ...扩展运算符代表默认配置，
+     */
+    extensions: ['.js', '.less', '.css', '...'],
+    /**
+     * 告诉 webpack 解析模块时应该搜索的目录，
+     * 告诉 webpack 优先 src 目录下查找需要解析的文件，会大大节省查找时间
+     */
+    modules: [resolve('src'), 'node_modules'],
+    externals: {
+      jquery: 'jQuery',
+    },
+  }
+
 }
 
 module.exports = (env, argv) => {
   console.log('argv.mode=', argv.mode) // 打印mode(模式) 值
-  // return config
+  return config
   // 这里可以通过不同的模式修改config配置
-  return smp.wrap(config);
+  // return smp.wrap(config);
 }

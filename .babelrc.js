@@ -28,7 +28,9 @@ module.exports = {
       },
     ]
   ],
+  // 对于正在提案中，还未进入 ECMA 规范中的新特性，Babel 是无法进行处理的，必须要安装对应的插件，例如：装饰器
   plugins: [
+    // Babel 其实提供了对应装饰器的插件: decorators必须放在properties前面
     ["@babel/plugin-proposal-decorators", { legacy: true }],
     ["@babel/plugin-proposal-class-properties", { loose: true }],
   ]
