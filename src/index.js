@@ -13,7 +13,7 @@ img.src = bg
 document.getElementById('imgBox').appendChild(img)
 
 // 新增装饰器的使用
-@log('hi')
+@log('hello')
 class MyClass {
 
 }
