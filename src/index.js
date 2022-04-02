@@ -28,4 +28,4 @@ function log (text) {
 const test = new MyClass()
 test.logger()
 
-index.js
+is.js
